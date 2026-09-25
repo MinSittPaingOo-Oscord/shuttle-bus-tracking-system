@@ -96,4 +96,47 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// GET /api/routes/:id/stops
+router.get('/:id/stops', async (req, res) => {
+  try {
+    const routeId = req.params.id;
+    // We assume your prisma client is imported at the top of this file
+    const routeStops = await prisma.routeStop.findMany({
+      where: { routeId: routeId },
+      include: { stop: true } // This attaches the actual stop details (name, location)
+    });
+    
+    res.json(routeStops);
+  } catch (error) {
+    console.error('Failed to fetch route stops:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/routes/:id/geometry
+router.get('/:id/geometry', async (req, res): Promise<void> => {
+  try {
+    const routeId = req.params.id;
+    
+    // Querying the "routes" table exactly as mapped in schema.prisma
+    const result = await prisma.$queryRaw`
+      SELECT ST_AsGeoJSON(geometry)::json as geometry 
+      FROM routes 
+      WHERE id = ${routeId}
+    `;
+
+    const rows = result as any[];
+
+    if (!rows || rows.length === 0 || !rows[0].geometry) {
+      res.status(404).json({ error: 'Geometry not found for this route' });
+      return;
+    }
+
+    res.status(200).json(rows[0].geometry);
+  } catch (error) {
+    console.error('Failed to fetch route geometry:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;

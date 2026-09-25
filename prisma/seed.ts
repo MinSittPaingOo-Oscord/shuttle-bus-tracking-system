@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -51,6 +52,31 @@ async function main() {
       { id: "V04", name: "Shuttle 04", type: "bus", status: "inactive" },
     ],
     skipDuplicates: true,
+  });
+
+  const adminPasswordHash = await bcrypt.hash("admin123",10);
+  await prisma.user.upsert({
+      where : {username : "admin"},
+      update : {},
+      create : {
+          username : "admin",
+          passwordHash : adminPasswordHash,
+          role : "ADMIN",
+      },
+  });
+
+  const devicePasswordHash = await bcrypt.hash("device123",10);
+  await prisma.trackingSource.upsert({
+      where : {id : "TS01"},
+      update : {},
+      create : {
+          id : "TS01",
+          name : "Mobile App - Shuttle 01",
+          type : "mobile",
+          vehicleId : "V01",
+          secretHash : devicePasswordHash,
+          credentialIssuedAt : new Date(),
+        }
   });
 
   console.log("Seed completed!");

@@ -35,7 +35,7 @@ model Route {
   color     String   @db.VarChar(7)
   status    String   @default("active") @db.VarChar(50)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
-
+  geometry Unsupported("geography")?
   // Relations
   vehicles   Vehicle[]
   routeStops RouteStop[]

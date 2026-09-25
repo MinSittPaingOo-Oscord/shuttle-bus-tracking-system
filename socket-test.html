@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Socket Test</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+  <h2>Status: <span id="status" style="color: orange;">Connecting...</span></h2>
+  
+  <button id="send-ping" style="padding: 10px; font-size: 16px;" disabled>Send Fake GPS Ping</button>
+  
+  <h3>Live Map Feed (Broadcasts received):</h3>
+  <ul id="map-feed"></ul>
+
+  <script>
+    // PASTE YOUR TOKEN HERE
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUUzAxIiwicm9sZSI6IkRFVklDRSIsInZlaGljbGVJZCI6IlYwMSIsImlhdCI6MTc5MDM2MDYyOCwiZXhwIjoxNzkwNDAzODI4fQ.t_H7jaTn4UweQPfsP1O9HnMKv4_s8FHBFORMcFI89To";
+    
+    const socket = io("http://localhost:5000", {
+      auth: { token: token }
+    });
+
+    const statusEl = document.getElementById('status');
+    const pingBtn = document.getElementById('send-ping');
+    const feedEl = document.getElementById('map-feed');
+
+    // Connection success
+    socket.on("connect", () => {
+      statusEl.innerText = "Connected!";
+      statusEl.style.color = "green";
+      pingBtn.disabled = false; // Enable the button
+    });
+
+    // Emulate the mobile app sending a location to the server
+    pingBtn.addEventListener('click', () => {
+      socket.emit('location:update', {
+        lat: 13.9644, // RSUs approximate latitude
+        lng: 100.5871, // RSUs approximate longitude
+        speed: 45,
+        heading: 90
+      });
+    });
+
+    // Emulate the Public Web catching the broadcast
+    socket.on("vehicle:location", (data) => {
+      const li = document.createElement('li');
+      li.innerText = `Vehicle ${data.vehicleId} moved to [${data.lat}, ${data.lng}] at ${data.speed}km/h`;
+      feedEl.appendChild(li);
+    });
+
+  </script>
+</body>
+</html>
