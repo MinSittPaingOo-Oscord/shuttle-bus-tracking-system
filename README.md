@@ -93,7 +93,7 @@ Use this section to connect frontend clients (Public Web, Admin Web) and Mobile 
 
 ### 2.1 Staging Infrastructure Endpoints
 
-* **Staging Backend URL:** `https://<your-render-service-name>.onrender.com`
+* **Staging Backend URL:** `https://shuttle-bus-tracking-system.onrender.com`
 * **Neon Cloud Database Host:** `ep-orange-firefly-b3vi3m1d-pooler.c-4.ap-southeast-1.aws.neon.tech`
 
 ### 2.2 Render Web Service Configuration Reference
