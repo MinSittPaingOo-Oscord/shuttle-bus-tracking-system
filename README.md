@@ -154,23 +154,13 @@ All endpoints accept and return JSON.
 
 | Resource | Method | Endpoint | Payload / Description |
 | --- | --- | --- | --- |
-| **Vehicles** | GET | `/api/vehicles` | List all vehicles.
-
- |
+| **Vehicles** | GET | `/api/vehicles` | List all vehicles.|
 |  | POST | `/api/vehicles` | `{"id":"V05","name":"Van 5","type":"van","assignedRouteId":"R01"}`<br> |
-| **Routes** | GET | `/api/routes` | List all routes.
-
- |
+| **Routes** | GET | `/api/routes` | List all routes. |
 |  | POST | `/api/routes` | `{"id":"R04","name":"Green","color":"#00AA55"}`<br> |
-|  | GET | `/api/routes/:id/stops` | Ordered list of stops on this route.
-
- |
-|  | GET | `/api/routes/:id/geometry` | GeoJSON coordinate array.
-
- |
-| **Stops** | GET | `/api/stops` | All stops with parsed `lat` and `lng`.
-
- |
+|  | GET | `/api/routes/:id/stops` | Ordered list of stops on this route.|
+|  | GET | `/api/routes/:id/geometry` | GeoJSON coordinate array. |
+| **Stops** | GET | `/api/stops` | All stops with parsed `lat` and `lng`. |
 |  | POST | `/api/stops` | `{"id":"S06","nameTh":"หน้าตึก 1","lat":13.9644,"lng":100.5871}`<br> |
 | **RouteStops** | POST | `/api/route-stops` | `{"routeId":"R01","stopId":"S01","stopOrder":1}`<br> |
 
