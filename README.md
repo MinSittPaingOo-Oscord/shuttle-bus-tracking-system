@@ -219,7 +219,7 @@ import { io } from "socket.io-client";
 
 const socket = io("https://shuttle-bus-tracking-system.onrender.com", {
   auth: {
-    token: "YOUR_DEVICE_JWT_TOKEN"
+    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUUzAxIiwicm9sZSI6IkRFVklDRSIsInZlaGljbGVJZCI6IlYwMSIsImlhdCI6MTc5MTY0ODAzMCwiZXhwIjoxNzkxNjkxMjMwfQ.L0DxfJQpxBo9gH5jREON-U8O27JtYLqh4tinvEhbRI8"
   }
 });
 
