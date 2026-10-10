@@ -130,8 +130,8 @@ npm start
 
 * **Web Frontend (`public-web`, Admin Web):** In your frontend `.env.local` or Vercel dashboard, point the API and socket base URLs to Render:
 ```env
-NEXT_PUBLIC_API_URL="https://<your-render-service-name>.onrender.com"
-NEXT_PUBLIC_SOCKET_URL="https://<your-render-service-name>.onrender.com"
+NEXT_PUBLIC_API_URL="https://shuttle-bus-tracking-system.onrender.com"
+NEXT_PUBLIC_SOCKET_URL="https://shuttle-bus-tracking-system.onrender.com"
 
 ```
 
@@ -217,7 +217,7 @@ Mobile tracking devices must authenticate using their JWT token during connectio
 ```javascript
 import { io } from "socket.io-client";
 
-const socket = io("https://<your-render-service-name>.onrender.com", {
+const socket = io("https://shuttle-bus-tracking-system.onrender.com", {
   auth: {
     token: "YOUR_DEVICE_JWT_TOKEN"
   }
@@ -271,7 +271,7 @@ Use the bundled `socket-test.html` file in the project root:
 
 1. Log in via `POST /api/auth/vehicle/login` with `TS01` / `device123` to get a JWT.
 2. Open `socket-test.html` in a web browser.
-3. Paste the token and server URL (`http://localhost:5000` or Render staging URL).
+3. Paste the token and server URL (`http://localhost:5000` or https://shuttle-bus-tracking-system.onrender.com).
 4. Emit location updates and inspect the real-time reception logs.
 
 ---
