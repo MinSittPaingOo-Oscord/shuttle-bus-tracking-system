@@ -7,24 +7,24 @@ This document is the unified technical integration and development manual for th
 
 ## 🛠️ Tech Stack & Architecture
 
-- **Runtime & Language:** Node.js (v18+) with TypeScript (`ts-node-dev` for local dev, `tsc` for production build)[cite: 7]
-- **API Framework:** Express.js[cite: 7]
-- **Real-Time Engine:** Socket.IO[cite: 6]
-- **ORM & Migrations:** Prisma Client (with PostgreSQL driver adapter)[cite: 7]
-- **Database Engine:** PostgreSQL 14+ with PostGIS extension (`geography` & `geometry` support)[cite: 6, 7]
+- **Runtime & Language:** Node.js (v18+) with TypeScript (`ts-node-dev` for local dev, `tsc` for production build)
+- **API Framework:** Express.js
+- **Real-Time Engine:** Socket.IO
+- **ORM & Migrations:** Prisma Client (with PostgreSQL driver adapter)
+- **Database Engine:** PostgreSQL 14+ with PostGIS extension (`geography` & `geometry` support)
 - **Cloud Infrastructure (Sprint 2.5):**
-  - **Database:** Neon Serverless PostgreSQL[cite: 8]
-  - **Backend Hosting:** Render Web Service[cite: 8]
-  - **Frontend Staging:** Vercel[cite: 8]
+  - **Database:** Neon Serverless PostgreSQL
+  - **Backend Hosting:** Render Web Service
+  - **Frontend Staging:** Vercel
 
 ---
 
 ## 💻 Part 1: Local Development & Database Setup
 
-Use this section to run the database and backend directly on your development machine[cite: 8].
+Use this section to run the database and backend directly on your development machine.
 
 ### 1.1 Environment Variables (`.env`)
-Create a `.env` file in the project root[cite: 7]:
+Create a `.env` file in the project root:
 
 ```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/shuttle_tracking"
