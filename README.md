@@ -1,29 +1,30 @@
-# 🚍 Shuttle Tracking System
 
-This document is the unified technical integration and development manual for the **Shuttle Tracking System** backend, consolidating Sprint 1 baseline CRUD operations, Sprint 2 real-time WebSocket pipelines, and Sprint 2.5 cloud deployment.
+# 🚍 Shuttle Tracking System — Backend & Staging Guide
+
+This document is the unified technical integration and development manual for the **Shuttle Tracking System** backend, consolidating Sprint 1 baseline CRUD operations, Sprint 2 real-time WebSocket pipelines, and Sprint 2.5 cloud deployment[cite: 6, 7, 8].
 
 ---
 
 ## 🛠️ Tech Stack & Architecture
 
-- **Runtime & Language:** Node.js (v18+) with TypeScript (`ts-node-dev` for local dev, `tsc` for production build)
-- **API Framework:** Express.js
-- **Real-Time Engine:** Socket.IO
-- **ORM & Migrations:** Prisma Client (with PostgreSQL driver adapter)
-- **Database Engine:** PostgreSQL 14+ with PostGIS extension (`geography` & `geometry` support)
-- **Cloud Infrastructure:**
-  - **Database:** Neon Serverless PostgreSQL
-  - **Backend Hosting:** Render Web Service
-  - **Frontend Staging:** Vercel
+- **Runtime & Language:** Node.js (v18+) with TypeScript (`ts-node-dev` for local dev, `tsc` for production build)[cite: 7]
+- **API Framework:** Express.js[cite: 7]
+- **Real-Time Engine:** Socket.IO[cite: 6]
+- **ORM & Migrations:** Prisma Client (with PostgreSQL driver adapter)[cite: 7]
+- **Database Engine:** PostgreSQL 14+ with PostGIS extension (`geography` & `geometry` support)[cite: 6, 7]
+- **Cloud Infrastructure (Sprint 2.5):**
+  - **Database:** Neon Serverless PostgreSQL[cite: 8]
+  - **Backend Hosting:** Render Web Service[cite: 8]
+  - **Frontend Staging:** Vercel[cite: 8]
 
 ---
 
-## 💻 Part 1: Local Development & Database Usage
+## 💻 Part 1: Local Development & Database Setup
 
-Use this section to run the database and backend directly on your development machine, either via bare-metal Node.js or Docker Compose.
+Use this section to run the database and backend directly on your development machine[cite: 8].
 
-### 1.1 Local Environment Variables (`.env`)
-Create a `.env` file in the project root:
+### 1.1 Environment Variables (`.env`)
+Create a `.env` file in the project root[cite: 7]:
 
 ```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/shuttle_tracking"
@@ -33,258 +34,263 @@ CORS_ORIGIN="*"
 
 ```
 
-> **Note on Special Characters:** If your local PostgreSQL password includes special characters (`@`, `:`, `/`, `%`, `#`), percent-encode them or use an alphanumeric password to avoid connection string parser errors.
+> **Note on Passwords:** If your local PostgreSQL password includes special characters (`@`, `:`, `/`, `%`, `#`), percent-encode them to avoid connection string parser errors.
+> 
+> 
 
 ### 1.2 Option A: Docker Compose Workflow (Recommended)
 
-The fastest way to spin up both PostgreSQL (with PostGIS) and the backend service:
+The fastest way to spin up PostgreSQL (with PostGIS) and the backend:
 
 ```bash
-# Start backend and database services
+# 1. Start backend and database services
 docker compose up -d
 
-# Run migrations inside the backend container
+# 2. Run migrations inside the backend container
 docker compose exec backend npx prisma migrate deploy
 
-# Seed test data (Stops, Routes, Vehicles, Test Credentials)
+# 3. Seed test data (Stops, Routes, Vehicles, Test Credentials)
 docker compose exec backend npx prisma db seed
 
 ```
 
 ### 1.3 Option B: Bare-Metal Setup
 
+Requires local Postgres with PostGIS installed.
+
 ```bash
-# 1. Install dependencies
 npm install
-
-# 2. Generate Prisma Client
 npx prisma generate
-
-# 3. Apply schema migrations
 npx prisma migrate dev
-
-# 4. Seed the database
 npx prisma db seed
-
-# 5. Start development server with hot-reload
 npm run dev
 
 ```
 
-### 1.4 How to Use Local Database & Backend
-
-* **Base URL:** `http://localhost:5000`
-* **Health Check Verification:**
-```bash
-curl http://localhost:5000/health
-# Response: {"status":"OK","database":"connected"}
-
-```
-
-
-*(Returns 200 OK and confirms connection to local PostgreSQL).*
-* **PostGIS Geographic Data Handling:** Stop locations use PostGIS `geography` types (`Unsupported("geography")` in schema). Spatial writes and queries use raw SQL (`ST_MakePoint`, `ST_X`, `ST_Y`) rather than standard Prisma object methods.
+**Verify Connection:** Run `curl http://localhost:5000/health`. Expect `{"status":"OK","database":"connected"}`.
 
 ---
 
 ## ☁️ Part 2: Deployed Staging Environment (Render & Neon)
 
-Use this section to connect frontend clients (Public Web, Admin Web) and Mobile devices to the shared staging infrastructure.
+The Sprint 2.5 shared staging environment is live and ready for frontend integration.
 
-### 2.1 Staging Infrastructure Endpoints
+### 2.1 Staging Endpoints
 
 * **Staging Backend URL:** `https://shuttle-bus-tracking-system.onrender.com`
-* **Neon Cloud Database Host:** `ep-orange-firefly-b3vi3m1d-pooler.c-4.ap-southeast-1.aws.neon.tech`
 
-### 2.2 Render Web Service Configuration Reference
-
-The staging backend runs on Render configured with the following parameters:
-
-* **Environment:** `Node`
-* **Build Command:**
-```bash
-npm install && npx prisma generate && npm run build
-
-```
+* **Neon Database Host:** `ep-orange-firefly-b3vi3m1d-pooler.c-4.ap-southeast-1.aws.neon.tech`
 
 
-* **Start Command:**
-```bash
-npm start
+### 2.2 Render Configuration
 
-```
+The backend runs on Render with these settings:
 
+* **Build Command:** `npm install && npx prisma generate && npm run build`
 
-*(Executes `node dist/src/server.js`)*
+* **Start Command:** `npm start`
 
-#### Render Environment Variables:
-
-| Variable Key | Purpose & Value Description |
-| --- | --- |
-| `DATABASE_URL` | Neon pooled connection string with `sslmode=require&channel_binding=require` |
-| `PORT` | Set to `10000` (Render default port) |
-| `JWT_SECRET` | Secret key used to sign and verify vehicle/device tokens |
-| `CORS_ORIGIN` | Set to `*` for staging cross-origin requests from Vercel |
-
-### 2.3 How to Connect to the Deployed Backend & Database
-
-* **Web Frontend (`public-web`, Admin Web):** In your frontend `.env.local` or Vercel dashboard, point the API and socket base URLs to Render:
-```env
-NEXT_PUBLIC_API_URL="https://shuttle-bus-tracking-system.onrender.com"
-NEXT_PUBLIC_SOCKET_URL="https://shuttle-bus-tracking-system.onrender.com"
-
-```
+* **Environment Variables:**
+* `DATABASE_URL`: Your Neon connection string (must include `sslmode=require&channel_binding=require`)
 
 
-* **Mobile App:** Point your HTTP client and Socket.IO client base URLs to the Render URL instead of local IP/localhost.
-* **Cold Starts Notice:** Render free instances spin down following periods of inactivity; the initial connection may take up to 50 seconds to complete while the container spins up.
+* `PORT`: `10000`
+
+* `JWT_SECRET`: Production secret string
+
+
+* `CORS_ORIGIN`: `*` (Allows Vercel access)
+
+
+
+
 
 ---
 
-## 🔌 Part 3: Complete REST API Reference
+## 🔑 Part 3: JWT Authentication Guide
 
-All requests accept and return JSON (`Content-Type: application/json`).
+The backend uses JSON Web Tokens (JWT) to securely authenticate vehicle devices.
 
-### 3.1 System & Authentication
+### 3.1 Generating a Token
 
-| Method | Endpoint | Auth Required | Body / Params | Description |
-| --- | --- | --- | --- | --- |
-| **GET** | `/health` | None | None | Checks server and database connectivity. |
-| **POST** | `/api/auth/vehicle/login` | None | `{"sourceId": "TS01", "secret": "device123"}` | Device login; returns a signed JWT. |
+The database seed provides a test vehicle (`TS01` / `device123`). To get your token:
 
-### 3.2 Vehicle Management (`/api/vehicles`)
+1. Send a `POST` request to `/api/auth/vehicle/login` (use `http://localhost:5000` for local, or the Render URL for staging).
 
-| Method | Endpoint | Auth | Body Payload | Description |
-| --- | --- | --- | --- | --- |
-| **GET** | `/api/vehicles` | None | None | Returns list of all vehicles. |
-| **GET** | `/api/vehicles/:id` | None | None | Fetch single vehicle details. |
-| **POST** | `/api/vehicles` | None | `{"id":"V05","name":"Van 5","type":"van","assignedRouteId":"R01"}` | Register new vehicle. |
-| **PUT** | `/api/vehicles/:id` | None | `{"status":"inactive"}` | Update vehicle info/status. |
-| **DELETE** | `/api/vehicles/:id` | None | None | Remove vehicle record. |
 
-### 3.3 Route Management (`/api/routes`)
+2. **Payload:** `{"sourceId": "TS01", "secret": "device123"}`.
 
-| Method | Endpoint | Auth | Body Payload | Description |
-| --- | --- | --- | --- | --- |
-| **GET** | `/api/routes` | None | None | Returns list of all routes. |
-| **GET** | `/api/routes/:id` | None | None | Fetch specific route details. |
-| **POST** | `/api/routes` | None | `{"id":"R04","name":"Green Line","color":"#00AA55"}` | Create route (`color` must be hex). |
-| **PUT** | `/api/routes/:id` | None | `{"name":"Updated Name"}` | Update route details. |
-| **DELETE** | `/api/routes/:id` | None | None | Delete a route. |
-| **GET** | `/api/routes/:id/stops` | None | None | Ordered list of stops on this route. |
-| **GET** | `/api/routes/:id/geometry` | None | None | Route line GeoJSON coordinate array. |
 
-### 3.4 Stop Management (`/api/stops`)
+3. Copy the returned `token` string (starts with `eyJ...`).
 
-| Method | Endpoint | Auth | Body Payload | Description |
-| --- | --- | --- | --- | --- |
-| **GET** | `/api/stops` | None | None | All stops with parsed `lat` and `lng`. |
-| **GET** | `/api/stops/:id` | None | None | Fetch single stop details. |
-| **POST** | `/api/stops` | None | `{"id":"S06","nameTh":"หน้าตึก 1","lat":13.9644,"lng":100.5871}` | Create stop (valid coordinates required). |
-| **PUT** | `/api/stops/:id` | None | `{"nameEn":"Building 1"}` | Update stop metadata. |
-| **DELETE** | `/api/stops/:id` | None | None | Delete stop (fails with 409 if linked). |
 
-### 3.5 Route Stop Assignment (`/api/route-stops`)
 
-| Method | Endpoint | Auth | Body Payload | Description |
-| --- | --- | --- | --- | --- |
-| **GET** | `/api/route-stops` | None | Optional query: `?routeId=R01` | Get route stop associations. |
-| **POST** | `/api/route-stops` | None | `{"routeId":"R01","stopId":"S01","stopOrder":1}` | Link stop to route at specific sequence. |
-| **PUT** | `/api/route-stops/:id` | None | `{"stopOrder":2}` | Update sequence order. |
-| **DELETE** | `/api/route-stops/:id` | None | None | Unlink stop from route. |
+*Tokens generated locally use your local `.env` secret; Render tokens use the cloud secret. They are not interchangeable.*
 
-### 3.6 Trip Lifecycle (`/api/trips`)
+### 3.2 Using the Token
 
-*Device-authenticated routes require header: `Authorization: Bearer <token>*`
+* **For REST API (Trips):** Pass in the header: `Authorization: Bearer <token>`.
 
-| Method | Endpoint | Auth | Body Payload | Description |
-| --- | --- | --- | --- | --- |
-| **POST** | `/api/trips/start` | Bearer | `{"routeId":"R01"}` | Starts trip (409 Conflict if active). |
-| **POST** | `/api/trips/:id/end` | Bearer | None | Marks trip completed with `endTime`. |
-| **GET** | `/api/trips/active` | Bearer | None | Fetches calling device's active trip. |
-| **GET** | `/api/trips/live` | None | None | Returns all active trips system-wide. |
 
----
+* **For Socket.IO:** Pass in the handshake auth object:
 
-## 📡 Part 4: Socket.IO Real-Time Engine
-
-The real-time WebSocket server operates alongside the HTTP server on the same port.
-
-### 4.1 Connection & Handshake Authentication
-
-Mobile tracking devices must authenticate using their JWT token during connection handshake:
 
 ```javascript
-import { io } from "socket.io-client";
-
-const socket = io("https://shuttle-bus-tracking-system.onrender.com", {
-  auth: {
-    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUUzAxIiwicm9sZSI6IkRFVklDRSIsInZlaGljbGVJZCI6IlYwMSIsImlhdCI6MTc5MTY0ODAzMCwiZXhwIjoxNzkxNjkxMjMwfQ.L0DxfJQpxBo9gH5jREON-U8O27JtYLqh4tinvEhbRI8"
-  }
+const socket = io("[https://shuttle-bus-tracking-system.onrender.com](https://shuttle-bus-tracking-system.onrender.com)", {
+  auth: { token: "<your_token_here>" }
 });
 
 ```
 
-### 4.2 Events & Payloads
 
-#### 1. Vehicle Telemetry Ping (Mobile -> Server)
 
-Emitted by authenticated vehicle tracker:
+---
+
+## 🔌 Part 4: REST API Reference
+
+All endpoints accept and return JSON.
+
+### 4.1 Core CRUD (No Auth Required)
+
+| Resource | Method | Endpoint | Payload / Description |
+| --- | --- | --- | --- |
+| **Vehicles** | GET | `/api/vehicles` | List all vehicles.
+
+ |
+|  | POST | `/api/vehicles` | `{"id":"V05","name":"Van 5","type":"van","assignedRouteId":"R01"}`<br> |
+| **Routes** | GET | `/api/routes` | List all routes.
+
+ |
+|  | POST | `/api/routes` | `{"id":"R04","name":"Green","color":"#00AA55"}`<br> |
+|  | GET | `/api/routes/:id/stops` | Ordered list of stops on this route.
+
+ |
+|  | GET | `/api/routes/:id/geometry` | GeoJSON coordinate array.
+
+ |
+| **Stops** | GET | `/api/stops` | All stops with parsed `lat` and `lng`.
+
+ |
+|  | POST | `/api/stops` | `{"id":"S06","nameTh":"หน้าตึก 1","lat":13.9644,"lng":100.5871}`<br> |
+| **RouteStops** | POST | `/api/route-stops` | `{"routeId":"R01","stopId":"S01","stopOrder":1}`<br> |
+
+Standard `GET /:id`, `PUT /:id`, and `DELETE /:id` are supported across all CRUD resources.
+
+### 4.2 Trip Lifecycle (Auth Required)
+
+Requires `Authorization: Bearer <token>` header, except `/live`.
+
+| Method | Endpoint | Body Payload | Description |
+| --- | --- | --- | --- |
+| **POST** | `/api/trips/start` | `{"routeId":"R01"}` | Starts trip (409 Conflict if already active).
+
+ |
+| **POST** | `/api/trips/:id/end` | None | Marks trip completed.
+
+ |
+| **GET** | `/api/trips/active` | None | Fetches calling device's active trip.
+
+ |
+| **GET** | `/api/trips/live` | None | Returns all active trips system-wide (No Auth).
+
+ |
+
+---
+
+## 📡 Part 5: Socket.IO Real-Time Engine
+
+### 5.1 Emitting GPS (Mobile -> Server)
+
+Emitted by the authenticated vehicle tracker:
 
 * **Event:** `location:update`
-* **Payload:**
-```json
-{
-  "lat": 13.9644,
-  "lng": 100.5871,
-  "speed": 35.5,
-  "heading": 180
-}
 
-```
+* **Payload:** `{"lat": 13.9644, "lng": 100.5871, "speed": 35.5, "heading": 180}`
 
 
-
-#### 2. Vehicle Location Broadcast (Server -> Web Clients)
+### 5.2 Receiving GPS (Server -> Web Clients)
 
 Listened to by Public Web and Admin Web map components:
 
 * **Event:** `vehicle:location`
-* **Payload Received:**
-```json
-{
-  "vehicleId": "V01",
-  "lat": 13.9644,
-  "lng": 100.5871,
-  "speed": 35.5,
-  "heading": 180,
-  "updatedAt": "2026-10-10T15:40:00.000Z"
-}
 
-```
+* **Payload Received:** `{"vehicleId": "V01", "lat": 13.9644, "lng": 100.5871, "speed": 35.5, "heading": 180, "updatedAt": "2026-10-10T15:40:00.000Z"}`
 
 
+### 5.3 Local Socket Testing
 
-### 4.3 Verifying Sockets Locally
+1. Get a JWT using `POST /api/auth/vehicle/login`.
 
-Use the bundled `socket-test.html` file in the project root:
 
-1. Log in via `POST /api/auth/vehicle/login` with `TS01` / `device123` to get a JWT.
-2. Open `socket-test.html` in a web browser.
-3. Paste the token and server URL (`http://localhost:5000` or https://shuttle-bus-tracking-system.onrender.com).
-4. Emit location updates and inspect the real-time reception logs.
+2. Open the included `socket-test.html` file in a browser.
+
+
+3. Paste the token and server URL, then emit fake GPS updates to verify the broadcast pipeline.
+
+
 
 ---
 
-## ⚠️ Troubleshooting & Common Pitfalls
+## 🤝 Part 6: Stackforce Team Integration Tasks (Sprint 2.5)
 
-| Error / Symptom | Root Cause | Solution |
+To meet the definition of done, the target flow (`Mobile -> Backend -> GPS -> Public + Admin`) must be integrated against the staging environment.
+
+### 📱 Mobile Developer Tasks
+
+1. Point HTTP/Socket URLs to `https://shuttle-bus-tracking-system.onrender.com`.
+
+
+2. Implement device login and securely pass the JWT into the Socket.IO handshake.
+
+
+3. Manage trip states (`/api/trips/start` & `/end`).
+
+
+4. Emit real GPS coordinates via the `location:update` socket event.
+
+
+
+### 💻 Web Developers (Public & Admin)
+
+1. Set `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_SOCKET_URL` to the Render backend.
+
+
+2. Connect map components to Socket.IO and listen for `vehicle:location` broadcasts.
+
+
+3. Improve dashboard layouts to ensure map visibility is the core focus.
+
+
+4. Deploy both frontends to Vercel.
+
+
+
+---
+
+## ⚠️ Part 7: Troubleshooting
+
+| Symptom | Root Cause | Solution |
 | --- | --- | --- |
-| `500 database: disconnected` | Invalid connection URL or DB offline | Verify `DATABASE_URL` credentials and ensure SSL mode is active (`sslmode=require`). |
-| `table ... does not exist` | Missing migration run | Run `npx prisma migrate dev` (local) or `npx prisma migrate deploy` (Neon/Docker). |
-| `Cannot find module '@prisma/client'` | Prisma client not generated | Execute `npx prisma generate` before compilation. |
-| Render deploy timeout or crash | Missing build artifact or start script | Verify `Build Command` includes `npm run build` and `Start Command` is `npm start`. |
-| Real-time events fail silently on mobile | Socket handshake unauthorized | Verify valid JWT is sent under `auth: { token }` property during socket connection. |
+| `500 database: disconnected` | Invalid DB URL or DB offline
+
+ | Check `DATABASE_URL` credentials. Ensure `sslmode=require` is set for Neon.
+
+ |
+| `table ... does not exist` | Missing schema migration
+
+ | Run `npx prisma migrate dev` (local) or `npx prisma migrate deploy` (Docker/Render).
+
+ |
+| `Cannot find module '@prisma/client'` | Missing Prisma client
+
+ | Run `npx prisma generate` before starting the server.
+
+ |
+| Real-time events fail silently | Auth failure
+
+ | Verify valid JWT is sent inside `auth: { token: "..." }` during socket initialization.
+
+ |
 
 ```
 
