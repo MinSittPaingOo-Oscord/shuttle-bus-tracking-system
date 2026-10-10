@@ -11,7 +11,6 @@ import http from 'http';
 import { Server } from 'socket.io';
 import jwt from 'jsonwebtoken';
 
-
 const app = express();
 
 // 1. Wrap the Express app in a standard HTTP server
@@ -27,20 +26,19 @@ const JWT_SECRET = process.env.JWT_SECRET || 'pick-any-long-random-string-here';
 // 3. Socket Authentication Middleware
 io.use((socket, next) => {
   const token = socket.handshake.auth?.token;
-  
+
+  // No token → allow Public / Admin to listen only
   if (!token) {
-    return next(new Error('Authentication error: Token missing'));
+    socket.data.user = { role: "LISTENER" };
+    return next();
   }
-  
+
   try {
-    // Cast to 'any' to prevent TypeScript strict mode errors
     const decoded = jwt.verify(token, JWT_SECRET) as any;
-    
-    // Attach the user data (like vehicleId and role) to the socket
     socket.data.user = decoded;
     next();
   } catch (err) {
-    return next(new Error('Authentication error: Invalid token'));
+    return next(new Error("Authentication error: Invalid token"));
   }
 });
 

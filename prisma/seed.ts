@@ -21,11 +21,11 @@ async function main() {
   await prisma.$executeRaw`
     INSERT INTO stops (id, name_th, name_en, location, status)
     VALUES
-      ('S01', 'ประตูหลัก', 'Main Gate', ST_SetSRID(ST_MakePoint(100.5018, 13.7563), 4326)::geography, 'active'),
-      ('S02', 'อาคารเรียนรวม', 'Main Building', ST_SetSRID(ST_MakePoint(100.5030, 13.7570), 4326)::geography, 'active'),
-      ('S03', 'ห้องสมุด', 'Library', ST_SetSRID(ST_MakePoint(100.5045, 13.7580), 4326)::geography, 'active'),
-      ('S04', 'หอพัก', 'Dormitory', ST_SetSRID(ST_MakePoint(100.5060, 13.7590), 4326)::geography, 'active'),
-      ('S05', 'โรงอาหาร', 'Cafeteria', ST_SetSRID(ST_MakePoint(100.5025, 13.7555), 4326)::geography, 'active')
+      ('S01', 'ประตูหลัก', 'Main Gate', ST_SetSRID(ST_MakePoint(100.5881689, 13.9648691), 4326)::geography, 'active'),
+      ('S02', 'อาคารเรียนรวม', 'Main Building', ST_SetSRID(ST_MakePoint(100.5871631, 13.9653204), 4326)::geography, 'active'),
+      ('S03', 'ห้องสมุด', 'Library', ST_SetSRID(ST_MakePoint(100.5870800, 13.9653220), 4326)::geography, 'active'),
+      ('S04', 'หอพัก', 'Dormitory', ST_SetSRID(ST_MakePoint(100.5854093, 13.9655833), 4326)::geography, 'active'),
+      ('S05', 'โรงอาหาร', 'Cafeteria', ST_SetSRID(ST_MakePoint(100.5862300, 13.9645642), 4326)::geography, 'active')
     ON CONFLICT (id) DO NOTHING;
   `;
 
