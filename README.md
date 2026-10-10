@@ -253,17 +253,10 @@ To meet the definition of done, the target flow (`Mobile -> Backend -> GPS -> Pu
 
 | Symptom | Root Cause | Solution |
 | --- | --- | --- |
-| `500 database: disconnected` | Invalid DB URL or DB offline
-| Check `DATABASE_URL` credentials. Ensure `sslmode=require` is set for Neon.|
-| `table ... does not exist` | Missing schema migration
-
- | Run `npx prisma migrate dev` (local) or `npx prisma migrate deploy` (Docker/Render).|
-| `Cannot find module '@prisma/client'` | Missing Prisma client
-
- | Run `npx prisma generate` before starting the server. |
-| Real-time events fail silently | Auth failure
-
- | Verify valid JWT is sent inside `auth: { token: "..." }` during socket initialization. |
+| `500 database: disconnected` | Invalid DB URL or DB offline | Check `DATABASE_URL` credentials. Ensure `sslmode=require` is set for Neon.|
+| `table ... does not exist` | Missing schema migration | Run `npx prisma migrate dev` (local) or `npx prisma migrate deploy` (Docker/Render).|
+| `Cannot find module '@prisma/client'` | Missing Prisma client | Run `npx prisma generate` before starting the server. |
+| Real-time events fail silently | Auth failure | Verify valid JWT is sent inside `auth: { token: "..." }` during socket initialization. |
 
 ```
 
