@@ -172,18 +172,10 @@ Requires `Authorization: Bearer <token>` header, except `/live`.
 
 | Method | Endpoint | Body Payload | Description |
 | --- | --- | --- | --- |
-| **POST** | `/api/trips/start` | `{"routeId":"R01"}` | Starts trip (409 Conflict if already active).
-
- |
-| **POST** | `/api/trips/:id/end` | None | Marks trip completed.
-
- |
-| **GET** | `/api/trips/active` | None | Fetches calling device's active trip.
-
- |
-| **GET** | `/api/trips/live` | None | Returns all active trips system-wide (No Auth).
-
- |
+| **POST** | `/api/trips/start` | `{"routeId":"R01"}` | Starts trip (409 Conflict if already active).|
+| **POST** | `/api/trips/:id/end` | None | Marks trip completed.|
+| **GET** | `/api/trips/active` | None | Fetches calling device's active trip. |
+| **GET** | `/api/trips/live` | None | Returns all active trips system-wide (No Auth). |
 
 ---
 
@@ -262,25 +254,16 @@ To meet the definition of done, the target flow (`Mobile -> Backend -> GPS -> Pu
 | Symptom | Root Cause | Solution |
 | --- | --- | --- |
 | `500 database: disconnected` | Invalid DB URL or DB offline
-
- | Check `DATABASE_URL` credentials. Ensure `sslmode=require` is set for Neon.
-
- |
+| Check `DATABASE_URL` credentials. Ensure `sslmode=require` is set for Neon.|
 | `table ... does not exist` | Missing schema migration
 
- | Run `npx prisma migrate dev` (local) or `npx prisma migrate deploy` (Docker/Render).
-
- |
+ | Run `npx prisma migrate dev` (local) or `npx prisma migrate deploy` (Docker/Render).|
 | `Cannot find module '@prisma/client'` | Missing Prisma client
 
- | Run `npx prisma generate` before starting the server.
-
- |
+ | Run `npx prisma generate` before starting the server. |
 | Real-time events fail silently | Auth failure
 
- | Verify valid JWT is sent inside `auth: { token: "..." }` during socket initialization.
-
- |
+ | Verify valid JWT is sent inside `auth: { token: "..." }` during socket initialization. |
 
 ```
 
