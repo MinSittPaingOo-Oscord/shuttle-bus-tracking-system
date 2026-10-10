@@ -1,7 +1,7 @@
 
 # 🚍 Shuttle Tracking System — Backend & Staging Guide
 
-This document is the unified technical integration and development manual for the **Shuttle Tracking System** backend, consolidating Sprint 1 baseline CRUD operations, Sprint 2 real-time WebSocket pipelines, and Sprint 2.5 cloud deployment[cite: 6, 7, 8].
+This document is the unified technical integration and development manual for the **Shuttle Tracking System** backend, consolidating Sprint 1 baseline CRUD operations, Sprint 2 real-time WebSocket pipelines, and Sprint 2.5 cloud deployment. 
 
 ---
 
