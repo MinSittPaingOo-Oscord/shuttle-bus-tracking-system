@@ -10,6 +10,9 @@ import tripRoutes from './routes/trip.routes';
 import http from 'http';
 import { Server } from 'socket.io';
 import jwt from 'jsonwebtoken';
+import comparisonRoutes from './routes/comparison.routes';
+
+
 
 const app = express();
 
@@ -82,6 +85,7 @@ app.use("/api/stops", stopRoutes);
 app.use("/api/route-stops", routeStopRoutes);
 app.use("/api/auth",authRoutes);
 app.use('/api/trips',tripRoutes);
+app.use('/api/comparison', comparisonRoutes);
 
 // ...keep your existing "/" and "/health" handlers unchanged
 app.get("/", (_req, res) => {
